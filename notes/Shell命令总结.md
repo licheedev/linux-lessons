@@ -1,6 +1,6 @@
 #  Shell命令总结
 ------
-## **1. Top 25个Shell命令 from [commandlinefu.com][1]**
+## **1. Top 25个Shell命令 from [commandlinefu][1]**
 
 * **以root身份运行上一次命令**
 ```Shell
