@@ -47,7 +47,7 @@ class B {
  2. A类具有一个可以将其转换为B的操作符，以明确的方式提供了转换方法
 ```C++
 class A{
-    public：
+    public:
 //转换操作符operator type()：type可以是基本数据类型，类，结构体
          operator B() const; 
 }
@@ -55,7 +55,7 @@ class A{
 所以针对上述问题，对于所有接受一个参数的构造函数用关键字`explicit`声明，也不建议用转换操作符，这是值得推荐的做法。一般而言，隐式转换的所有可能性都是不好的思路，还记得深入计算机系统第二章讲过FreeBSD开源系统曾出现的getpeername的安全漏洞么，这是由于无符号数和有符号数间的不匹配造成了隐式类型转换。不过我们还可以用另外一个方法进行转换
 ```C++
 class A{
-    public：
+    public:
          B asB() const; 
 }
 
@@ -105,7 +105,7 @@ void SCPP_AssertErrorHandler(const char *file_name,
 #endif
 }
 
-#scpp.h
+#scpp_assert.h
 #ifdef SCPP_THROW_EXCEPTION_ON_BUG
 #include<exception>
 
@@ -114,8 +114,9 @@ namespace scpp {
 		private:
 			std::string what_;
 		public:
-			ScppAssertFailedException(const char *file_name,                                      unsigned line_no,   
-                                      const char *msg);
+			ScppAssertFailedException(const char *file_name,                                      
+			                          unsigned line_no,   
+                                                  const char *msg);
 			virtual void const char* getwhat() const throw()          { return what_.c_str();}
 			virtual ~ScppAssertFailedException() throw() {}
 	}
@@ -126,8 +127,8 @@ namespace scpp {
 #ifdef SCPP_THROW_EXCEPTION_ON_BUG
 namespace scpp {
 	ScppAssertFailedException::ScppAssertFailedException(const char *file_name,
-			                                             unsigned line_no,
-			                                             const char *msg) {
+			                                     unsigned line_no,
+			                                     const char *msg) {
 		ostringstream s;
 		s << "SCPP Assertion failed with message " <<msg <<" in file " <<file_name << " # "<<line_no;
 		what_=s.str();
@@ -137,11 +138,11 @@ namespace scpp {
 ```
 我们可以看到该宏接受一个条件和一条错误信息。条件为真不执行任何事情，为假时，错误信息会输出到`ostringstream`中，并且错误处理函数将被调用。这里有两个问题：
 
-*  问：为什么要调用assert.cpp文件中一个单独AssertErrorHandler函数，而不是在assert.h文件的宏中执行相同的操作
+*  问：为什么要调用scpp_assert.cpp文件中一个单独AssertErrorHandler函数，而不是在scpp_assert.h文件的宏中执行相同的操作
    答：调试器更擅长对函数而不是宏进行逐步调试
 *  问：为什么AssertErrorHandler函数向我们提供了两种选择机会，要么终止程序，要么抛出一个异常
    答：在最常见的情况下我们发现第一个缺陷时默认采取的办法是终止程序，修补缺陷并再次开始，这时候将打印出错误信息并终止程序，即对应没有定义的SCPP_THROW_EXCEPTION_ON_BUG符号。那么定义了该符号的情况呢，在某些情况下，有部分安全检查必须保留在代码中，即使是在产品模式下。假设有一个持续依次处理大量请求的程序在处理某个请求时安全检查失败，终止程序并不是理想的选择，应该采取的办法是抛出一个异常，包含详细的错误信息并把错误信息记录在某日志文件中，可能还需要发送邮件或警报，宣布对当前请求的处理失败，同时继续处理发送其他的请求。
-标签（空格分隔）： C++ 调试 
+
 
 
 
